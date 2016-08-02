@@ -1,0 +1,20 @@
+#!/bin/bash
+username={mysqluser}
+password={mysqlpassword}
+database={mysqldb}
+
+backupfolder="/home/deploy/backup"
+backupfile=$(ls -t *.gz | head -1)
+
+if [ -z "$backupfile" ]
+then
+   echo "" >> /dev/null
+elif ! [ -z "$backupfile" ]
+then
+   cp $backupfile /tmp/$backupfile
+   /bin/gunzip /tmp/$backupfile
+   filename="/tmp/"${backupfile%.*}
+   /usr/bin/mysql --user=$username --password=$password $database < "$filename"
+   /bin/rm $filename
+fi
+exit 0

@@ -1,0 +1,17 @@
+#!/bin/bash
+username={mysqluser}
+password={mysqlpassword}
+database={mysqldb}
+backupfolder="/home/deploy/backup"
+
+[[ -d $backupfolder ]] || mkdir $backupfolder
+
+now="$(date +'%d_%m_%Y_%H_%M_%S')"
+filename="db_backup_$now".gz
+fullpathbackupfile="$backupfolder/$filename"
+logfile="$backupfolder/"backup_log_"$(date +'%Y_%m')".txt
+echo "mysqldump started at $(date +'%d-%m-%Y %H:%M:%S')" >> "$logfile"
+/usr/bin/mysqldump --single-transaction --user=$username --password=$password $database | gzip > "$fullpathbackupfile"
+echo "mysqldump finished at $(date +'%d-%m-%Y %H:%M:%S')" >> "$logfile"
+/usr/bin/find $backupfolder -name "*.gz" -mtime +31 -type f -delete
+exit 0
